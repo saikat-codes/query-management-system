@@ -2,10 +2,12 @@ const nodemailer = require('nodemailer')
 const axios = require('axios')
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS
   }
 })
 
@@ -22,7 +24,7 @@ const sendEmail = async (to, name, message, status = 'pending') => {
   const s = getStatusStyle(status)
   try {
     await transporter.sendMail({
-      from: `"QueryFlow" <${process.env.GMAIL_USER}>`,
+      from: `"QueryFlow" <${process.env.BREVO_USER}>`,
       to,
       subject: status === 'pending'
         ? '✅ We received your query — QueryFlow'
