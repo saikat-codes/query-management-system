@@ -3,8 +3,8 @@ const axios = require('axios')
 
 const transporter = nodemailer.createTransport({
   host: 'smtp-relay.brevo.com',
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_PASS
@@ -27,7 +27,7 @@ const sendEmail = async (to, name, message, status = 'pending') => {
   const s = getStatusStyle(status)
   try {
     await transporter.sendMail({
-      from: `"QueryFlow" <${process.env.BREVO_USER}>`,
+      from: `"QueryFlow" <${process.env.MAIL_FROM}>`,
       to,
       subject: status === 'pending'
         ? '✅ We received your query — QueryFlow'
