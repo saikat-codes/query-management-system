@@ -6,14 +6,15 @@ import Navbar from './components/Navbar'
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen"
-        style={{
-          background: '#1a1a2e',
-          backgroundImage: `
-            radial-gradient(ellipse at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 60%),
-            radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.1) 0%, transparent 50%)
-          `
-        }}>
+      <div className="min-h-screen overflow-hidden"
+     style={{
+       backgroundColor: '#090d16',
+       backgroundImage: `
+         linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(9, 13, 22, 0.8) 100%),
+         radial-gradient(at 80% 20%, rgba(139, 92, 246, 0.3) 0px, transparent 50%)
+       `,
+       backgroundAttachment: 'fixed'
+     }}>
         <Navbar />
         <Routes>
           <Route path="/" element={<UserPage />} />
