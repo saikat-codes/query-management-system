@@ -1,6 +1,6 @@
 <div align="center">
 
-# QueryFlow 🔔
+# QueryFlow 💬
 
 **A full-stack query management system with real-time email and Telegram notifications.**
 
@@ -21,8 +21,11 @@
 ## 📸 Screenshots
 
 ![User Page](screenshots/user-page.png)
+<br>
 ![Admin Login](screenshots/admin-login.png)
+<br>
 ![Admin Panel](screenshots/admin-panel.png)
+<br>
 ![Email Notification](screenshots/email-notification.png)
 
 ---
@@ -232,12 +235,6 @@ VITE_API_URL=https://query-management-system-e8a3.onrender.com/api/queries
 Notifications are delivered via **QueryFlow Bot** on Telegram.
 
 👉 [@queryflow_notify_bot](https://t.me/queryflow_notify_bot)
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
