@@ -15,6 +15,12 @@
 
 </div>
 
+## 🔐 Demo Access
+
+| Panel | URL | Password |
+|---|---|---|
+| Admin | /admin | ```admin123``` |
+
 ---
 
 ## 📸 Screenshots
