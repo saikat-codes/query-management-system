@@ -8,6 +8,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 })
 
@@ -81,10 +84,10 @@ ${s.emoji} *Status:* ${s.label}
 ⏰ *Time:* ${new Date().toLocaleString()}
     `.trim()
 
-    await axios.get(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
-      { params: { chat_id: process.env.TELEGRAM_CHAT_ID, text, parse_mode: 'Markdown' } }
-    )
+   await axios.get(
+     `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+     { params: { chat_id: process.env.TELEGRAM_CHAT_ID, text } },
+   );
     console.log('Telegram sent')
   } catch (error) {
     console.log('Telegram failed:', error.message)
