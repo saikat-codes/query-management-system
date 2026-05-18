@@ -22,7 +22,7 @@
 
 <div align="center">
 
-### 👤 User Page
+### ⚙️ Admin Panel
 <img src="screenshots/user-page.png" alt="User Page" width="850"/>
 
 ---
@@ -32,7 +32,7 @@
 
 ---
 
-### ⚙️ Admin Panel
+### 👤 User Page
 <img src="screenshots/admin-panel.png" alt="Admin Panel" width="850"/>
 
 ---
