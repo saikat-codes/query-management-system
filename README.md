@@ -20,13 +20,27 @@
 
 ## 📸 Screenshots
 
-![User Page](screenshots/user-page.png)
-<br>
-![Admin Login](screenshots/admin-login.png)
-<br>
-![Admin Panel](screenshots/admin-panel.png)
-<br>
-![Email Notification](screenshots/email-notification.png)
+<div align="center">
+
+### 👤 User Page
+<img src="screenshots/user-page.png" alt="User Page" width="850"/>
+
+---
+
+### 🔐 Admin Login
+<img src="screenshots/admin-login.png" alt="Admin Login" width="850"/>
+
+---
+
+### ⚙️ Admin Panel
+<img src="screenshots/admin-panel.png" alt="Admin Panel" width="850"/>
+
+---
+
+### 📧 Email Notification
+<img src="screenshots/email-notification.png" alt="Email Notification" width="850"/>
+
+</div>
 
 ---
 
