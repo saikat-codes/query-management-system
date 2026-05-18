@@ -90,13 +90,13 @@ function AdminPage() {
             placeholder="••••••••"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && (password === process.env.AUTH_PASSWORD ? setAuthed(true) : alert('Wrong password'))}
+            onKeyDown={e => e.key === 'Enter' && (password === import.meta.env.VITE_AUTH_PASSWORD ? setAuthed(true) : alert('Wrong password'))}
             className="w-full h-11 px-3.5 rounded-xl text-sm text-white placeholder-white/20 bg-white/4 border border-white/10 outline-none focus:border-indigo-500/80 focus:bg-indigo-500/2 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-200 mb-5 font-mono font-bold"
           />
 
           <button
             onClick={() => {
-              if (password === process.env.AUTH_PASSWORD) setAuthed(true)
+              if (password === import.meta.env.VITE_AUTH_PASSWORD) setAuthed(true)
               else alert('Wrong password')
             }}
             className="w-full relative px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-all duration-200 active:scale-[0.98] overflow-hidden bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/40 cursor-pointer before:absolute before:inset-0 before:w-full before:h-full before:bg-linear-to-b before:from-white/10 before:to-transparent"
