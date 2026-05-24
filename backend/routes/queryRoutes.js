@@ -1,11 +1,13 @@
 const express = require('express')
-const { createQuery, getAllQueries, updateQuery, deleteQuery } = require('../controllers/queryController')
+const protect = require('../middleware/protect')
+const { createQuery, getAllQueries, updateQuery, deleteQuery, getMyQueries } = require('../controllers/queryController')
 
-const router = express.Router();
+const router = express.Router()
 
-router.post('/', createQuery);
-router.get('/',getAllQueries);
-router.put('/:id', updateQuery);
-router.delete('/:id', deleteQuery);
+router.post('/', createQuery)
+router.get('/', getAllQueries)
+router.put('/:id', updateQuery)
+router.delete('/:id', deleteQuery)
+router.get('/my', protect, getMyQueries)
 
-module.exports = router;
+module.exports = router
