@@ -9,6 +9,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 [![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
 
@@ -22,20 +23,30 @@
 
 <div align="center">
 
-### ⚙️ Admin Panel
+### 👤 User Page
 <img src="screenshots/user-page.png" alt="User Page" width="850"/>
 
----
+<br>
 
 ### 🔐 Admin Login
 <img src="screenshots/admin-login.png" alt="Admin Login" width="850"/>
 
----
+<br>
 
-### 👤 User Page
+### ⚙️ Admin Panel
 <img src="screenshots/admin-panel.png" alt="Admin Panel" width="850"/>
 
----
+<br>
+
+### 🔍 Query Tracker Login
+<img src="screenshots/queries-login.png" alt="Query Tracker Login" width="850"/>
+
+<br>
+
+### 📋 Query Tracker Panel
+<img src="screenshots/queries-panel.png" alt="Query Tracker Panel" width="850"/>
+
+<br>
 
 ### 📧 Email Notification
 <img src="screenshots/email-notification.png" alt="Email Notification" width="850"/>
@@ -47,10 +58,16 @@
 ## ✨ Features
 
 ### 👤 User
-- Submit queries with name, email and message
+- Submit queries with name, email, password and message
+- First submission creates an account automatically
 - Instant styled HTML email confirmation on submission
 - Real-time Telegram notification on submission
 - Email notification on every status change
+
+### 🔍 Query Tracker
+- Login with email and password to track your queries
+- See all submitted queries and their current statuses
+- Status updates reflected in real time
 
 ### 🛠 Admin
 - Password-protected admin panel
@@ -77,6 +94,7 @@
 | Frontend | React 19, Vite, Tailwind CSS |
 | Backend | Node.js, Express.js |
 | Database | MongoDB Atlas, Mongoose |
+| Auth | JWT, bcryptjs, httpOnly Cookies |
 | Email | Brevo Transactional Email API |
 | Telegram | Telegram Bot API + Axios |
 | Deployment | Vercel (frontend), Render (backend) |
@@ -88,6 +106,7 @@
 | Panel | URL | Password |
 |---|---|---|
 | Admin | [/admin](https://query-management-system-one.vercel.app/admin) | `admin123` |
+| Track Query | [/track](https://query-management-system-one.vercel.app/track) | Use email + password from submission |
 
 ---
 
@@ -95,12 +114,24 @@
 
 Base URL: `https://query-management-system-e8a3.onrender.com`
 
+### Queries
+
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/queries` | Submit a new query | No |
+| `GET` | `/api/queries` | Get all queries | No |
+| `GET` | `/api/queries/my` | Get logged in user's queries | ✅ Cookie |
+| `PUT` | `/api/queries/:id` | Update query status | No |
+| `DELETE` | `/api/queries/:id` | Delete a query | No |
+
+### Auth
+
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/queries` | Submit a new query |
-| `GET` | `/api/queries` | Get all queries |
-| `PUT` | `/api/queries/:id` | Update query status |
-| `DELETE` | `/api/queries/:id` | Delete a query |
+| `POST` | `/api/auth/register` | Register a new user |
+| `POST` | `/api/auth/login` | Login and receive cookie |
+| `POST` | `/api/auth/logout` | Clear auth cookie |
+| `GET` | `/api/auth/me` | Get current user |
 
 ### Example Request — Submit a query
 ```json
@@ -108,6 +139,7 @@ POST /api/queries
 {
   "name": "Saikat Das",
   "email": "saikat@gmail.com",
+  "password": "yourpassword",
   "message": "I need help with my account"
 }
 ```
@@ -120,6 +152,7 @@ POST /api/queries
   "email": "saikat@gmail.com",
   "message": "I need help with my account",
   "status": "pending",
+  "userId": "xyz456",
   "createdAt": "2026-05-17T10:00:00.000Z",
   "updatedAt": "2026-05-17T10:00:00.000Z"
 }
@@ -154,6 +187,8 @@ BREVO_API_KEY=your_brevo_api_key
 MAIL_FROM=your_verified_sender_email
 TELEGRAM_TOKEN=your_telegram_bot_token
 TELEGRAM_CHAT_ID=your_telegram_chat_id
+JWT_SECRET=your_jwt_secret_key
+NODE_ENV=development
 ```
 
 Start the backend:
@@ -170,6 +205,8 @@ npm install
 Create a `.env` file in the `frontend/` folder:
 ```env
 VITE_API_URL=http://localhost:5000/api/queries
+VITE_BASE_URL=http://localhost:5000
+VITE_AUTH_PASSWORD=admin123
 ```
 
 Start the frontend:
@@ -194,10 +231,15 @@ query-management-system/
 │   ├── config/
 │   │   └── db.js
 │   ├── controllers/
+│   │   ├── authController.js
 │   │   └── queryController.js
+│   ├── middleware/
+│   │   └── protect.js
 │   ├── models/
+│   │   ├── User.js
 │   │   └── Query.js
 │   ├── routes/
+│   │   ├── authRoutes.js
 │   │   └── queryRoutes.js
 │   ├── utils/
 │   │   └── notifications.js
@@ -206,12 +248,14 @@ query-management-system/
 ├── frontend/
 │   └── src/
 │       ├── api/
+│       │   ├── auth.js
 │       │   └── queries.js
 │       ├── components/
 │       │   └── Navbar.jsx
 │       ├── pages/
 │       │   ├── UserPage.jsx
-│       │   └── AdminPage.jsx
+│       │   ├── AdminPage.jsx
+│       │   └── TrackPage.jsx
 │       └── App.jsx
 │
 ├── screenshots/
@@ -235,11 +279,15 @@ BREVO_API_KEY
 MAIL_FROM
 TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID
+JWT_SECRET
+NODE_ENV=production
 ```
 
 ### Vercel Environment Variables
 ```
 VITE_API_URL=https://query-management-system-e8a3.onrender.com/api/queries
+VITE_BASE_URL=https://query-management-system-e8a3.onrender.com
+VITE_AUTH_PASSWORD=admin123
 ```
 
 ---
