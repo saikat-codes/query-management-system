@@ -4,11 +4,10 @@ const jwt =  require('jsonwebtoken')
 //make token and set cookie
 const sendTokenCookie = (res, userId) => {
   const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '7d'})
-
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: true,
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000
   })
 }
@@ -63,11 +62,13 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
-  res.cookie("token", "", {
+  res.cookie('token', '', {
     httpOnly: true,
-    expires: new Date(0),
-  });
-  res.status(200).json({ message: "Logged out" });
+    secure: true,
+    sameSite: 'none',
+    expires: new Date(0)
+  })
+  res.status(200).json({ message: 'Logged out' })
 };
 
 const getMe = async (req, res) => {
