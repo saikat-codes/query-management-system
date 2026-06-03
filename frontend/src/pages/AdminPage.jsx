@@ -110,9 +110,6 @@ function AdminPage() {
             {queries.filter(q => q.status === 'pending').length === 1 ? 'query' : 'queries'} to review
           </p>
         </div>
-        <p className="text-sm text-slate-600 font-poppins font-medium">
-          {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-10">

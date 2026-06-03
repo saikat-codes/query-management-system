@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { submitQuery } from '../api/queries'
 
 function UserPage() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -21,7 +21,7 @@ function UserPage() {
       setError('')
       await submitQuery(formData)
       setSuccess(true)
-      setFormData({ name: '', email: '', message: '' })
+      setFormData({ name: '', email: '', message: '', password: '' })
     } catch (err) {
       setError('Failed to submit query. Please try again.')
       console.log(err);
@@ -97,7 +97,7 @@ function UserPage() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Peter Parker"
+              placeholder="Tony Stark"
               className="w-full bg-[#1a1a1a] border border-[#1e293b] text-slate-200 text-sm px-4 py-3 rounded outline-none focus:border-teal-300/50 focus:bg-[#1c1c1c] transition-colors placeholder-slate-600 font-mono"
             />
           </div>
@@ -111,9 +111,27 @@ function UserPage() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="peter@dailybugle.com"
+              placeholder="tony@starkindustries.com"
               className="w-full bg-[#1a1a1a] border border-[#1e293b] text-slate-200 text-sm px-4 py-3 rounded outline-none focus:border-teal-300/50 focus:bg-[#1c1c1c] transition-colors placeholder-slate-600 font-mono"
             />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-slate-400 text-[13px] uppercase tracking-widest font-bold">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="w-full h-11 px-3.5  text-sm text-white placeholder-white/25 bg-white/4 border border-[#1e293b] rounded outline-none focus:border-teal-300/50 focus:bg-teal-500/2 focus:ring-4 focus:ring-teal-500/10 transition-all duration-200 font-mono font-bold placeholder:font-normal"
+            />
+            <p className="text-slate-500 text-[11px] font-mono">
+              First time? This creates your account. Returning? Use your
+              existing password.
+            </p>
           </div>
 
           <div>
@@ -132,12 +150,12 @@ function UserPage() {
         </div>
 
         <div className="flex items-center justify-between pt-6 border-t border-white/5">
-           <div className="flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse" />
-              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-                Pending
-              </span>
-            </div>
+          <div className="flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse" />
+            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+              Pending
+            </span>
+          </div>
           <button
             type="submit"
             disabled={loading}
