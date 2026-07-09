@@ -1,25 +1,32 @@
 const axios = require('axios')
 
 const getStatusStyle = (status) => {
-  const styles = {
-    'pending':     { color: '#d97706', bg: '#fffbeb', emoji: '🟡', label: 'Pending' },
-    'in-progress': { color: '#2563eb', bg: '#eff6ff', emoji: '🔵', label: 'In Progress' },
-    'resolved':    { color: '#16a34a', bg: '#f0fdf4', emoji: '🟢', label: 'Resolved' }
+  if (status === 'in-progress') {
+    return { color: '#2563eb', bg: '#eff6ff', emoji: '🔵', label: 'In Progress' }
+  } else if (status === 'resolved') {
+    return { color: '#16a34a', bg: '#f0fdf4', emoji: '🟢', label: 'Resolved' }
+  } else {
+    return { color: '#d97706', bg: '#fffbeb', emoji: '🟡', label: 'Pending' }
   }
-  return styles[status] || styles['pending']
 }
 
 const sendEmail = async (to, name, message, status = 'pending') => {
   const s = getStatusStyle(status)
+
+  let subjectLine = `🔔 Your query status updated to ${s.label} — QueryFlow`
+  if (status === 'pending') {
+    subjectLine = '✅ We received your query — QueryFlow'
+  }
+
   try {
+    console.log('Notification Service: Dispatching email delivery task via Brevo api to:', to)
+
     await axios.post(
       'https://api.brevo.com/v3/smtp/email',
       {
         sender: { name: 'QueryFlow', email: process.env.MAIL_FROM },
         to: [{ email: to }],
-        subject: status === 'pending'
-          ? '✅ We received your query — QueryFlow'
-          : `🔔 Your query status updated to ${s.label} — QueryFlow`,
+        subject: subjectLine,
         htmlContent: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
             <div style="background: #4f46e5; padding: 32px; text-align: center;">
@@ -57,17 +64,24 @@ const sendEmail = async (to, name, message, status = 'pending') => {
         }
       }
     )
-    console.log('Email sent to', to)
+    console.log('Email sent successfully to:', to)
   } catch (error) {
-    console.log('Email failed:', error.response?.data || error.message)
+    console.log('Email delivery failing details:', error.response?.data || error.message)
   }
 }
 
 const sendTelegram = async (name, email, message, status = 'pending') => {
   const s = getStatusStyle(status)
+
+  let trackingTitle = 'Query Status Updated'
+  if (status === 'pending') {
+    trackingTitle = 'New Query Received'
+  }
+
   try {
+    console.log('Notification Service: Broadcasting query feed push out to Telegram logs...')
     const text = `
-🔔 *${status === 'pending' ? 'New Query Received' : 'Query Status Updated'}*
+🔔 *${trackingTitle}*
 
 👤 *Name:* ${name}
 📧 *Email:* ${email}
@@ -79,13 +93,18 @@ ${s.emoji} *Status:* ${s.label}
 ⏰ *Time:* ${new Date().toLocaleString()}
     `.trim()
 
-   await axios.get(
-     `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
-     { params: { chat_id: process.env.TELEGRAM_CHAT_ID, text } },
-   );
-    console.log('Telegram sent')
+    await axios.get(
+      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+      {
+        params: {
+          chat_id: process.env.TELEGRAM_CHAT_ID,
+          text: text
+        }
+      }
+    );
+    console.log('Telegram event channel updated successfully')
   } catch (error) {
-    console.log('Telegram failed:', error.message)
+    console.log('Telegram pipe delivery failed:', error.message)
   }
 }
 

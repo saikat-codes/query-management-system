@@ -1,10 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 
-function Navbar() {
+function Navbar({ onLogout, currentUser }) {
   const location = useLocation()
-  const isAdmin = location.pathname === '/admin'
-  const isUser = location.pathname === '/'
-  const isTrack = location.pathname === '/track'
 
   return (
     <nav className="px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between border-b border-white/5">
@@ -21,30 +18,50 @@ function Navbar() {
       <div className="flex items-center gap-3 sm:gap-6">
         <Link
           to="/admin"
-          className={`no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold
-            ${isAdmin ? 'text-teal-300' : 'text-slate-500'}`}
+          className={`no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold ${location.pathname === '/admin' ? 'text-teal-300' : 'text-slate-500'}`}
         >
           <span className="hidden sm:inline">Admin panel</span>
           <span className="sm:hidden">Admin</span>
         </Link>
 
-        <Link
-          to="/"
-          className={`no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold
-            ${isUser ? 'text-teal-300' : 'text-slate-500'}`}
-        >
-          <span className="hidden sm:inline">User page</span>
-          <span className="sm:hidden">Submit</span>
-        </Link>
+        {location.pathname === '/submit' && (
+          <Link
+            to="/track"
+            className="no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold text-slate-500"
+          >
+            <span className="hidden sm:inline">Track Query</span>
+            <span className="sm:hidden">Track</span>
+          </Link>
+        )}
 
-        <Link
-          to="/track"
-          className={`no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold
-            ${isTrack ? 'text-teal-300' : 'text-slate-500'}`}
-        >
-          <span className="hidden sm:inline">Track Query</span>
-          <span className="sm:hidden">Track</span>
-        </Link>
+        {location.pathname === '/track' && (
+          <Link
+            to="/submit"
+            className="no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold text-slate-500"
+          >
+            <span className="hidden sm:inline">User page</span>
+            <span className="sm:hidden">Submit</span>
+          </Link>
+        )}
+
+        {location.pathname !== '/submit' && location.pathname !== '/track' && (
+          <Link
+            to="/"
+            className={`no-underline text-[10px] sm:text-xs hover:text-teal-300 transition-colors tracking-wide uppercase font-bold ${location.pathname === '/' ? 'text-teal-300' : 'text-slate-500'}`}
+          >
+            <span className="hidden sm:inline">User page</span>
+            <span className="sm:hidden">Submit</span>
+          </Link>
+        )}
+
+        {currentUser && (
+          <button
+            onClick={onLogout}
+            className="bg-transparent border-none p-0 cursor-pointer text-[10px] sm:text-xs text-rose-400 hover:text-rose-300 transition-colors tracking-wide uppercase font-bold font-sans"
+          >
+            Logout
+          </button>
+        )}
       </div>
 
     </nav>

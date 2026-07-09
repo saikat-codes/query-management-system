@@ -20,42 +20,71 @@ function AdminPage() {
 
   const fetchQueries = async () => {
     try {
+      console.log('fetching all user queries from database...')
       const res = await getAllQueries()
       setQueries(res.data)
     } catch (err) {
-      console.log(err)
+      console.log('error fetching records:', err)
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (authed) fetchQueries()
+    if (authed) {
+      fetchQueries()
+    }
   }, [authed])
 
   const handleStatus = async (id, status) => {
+    console.log('changing status for:', id, 'to:', status)
     await updateQuery(id, status)
     fetchQueries()
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this query?')) return
+    const confirmDelete = window.confirm('Delete this query?')
+    if (!confirmDelete) return
+
+    console.log('deleting record:', id)
     await deleteQuery(id)
     fetchQueries()
   }
 
-  const filtered = queries
-    .filter(q => filter === 'all' ? true : q.status === filter)
-    .filter(q =>
-      q.name.toLowerCase().includes(search.toLowerCase()) ||
-      q.email.toLowerCase().includes(search.toLowerCase()) ||
-      q.message.toLowerCase().includes(search.toLowerCase())
-    )
+  let filtered = queries
+
+  if (filter !== 'all') {
+    filtered = filtered.filter(q => q.status === filter)
+  }
+
+  if (search !== '') {
+    filtered = filtered.filter(q => {
+      const nameMatch = q.name.toLowerCase().includes(search.toLowerCase())
+      const emailMatch = q.email.toLowerCase().includes(search.toLowerCase())
+      const messageMatch = q.message.toLowerCase().includes(search.toLowerCase())
+      return nameMatch || emailMatch || messageMatch
+    })
+  }
 
   const statusConfig = (status) => {
     if (status === 'pending') return { color: 'text-amber-400', label: 'Pending' }
     if (status === 'in-progress') return { color: 'text-teal-300', label: 'In Progress' }
     if (status === 'resolved') return { color: 'text-slate-500', label: 'Resolved' }
+  }
+
+  const checkPassword = () => {
+    console.log('checking admin credential...')
+    if (password === import.meta.env.VITE_AUTH_PASSWORD) {
+      setAuthed(true)
+    } else {
+      alert('Wrong password')
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      checkPassword()
+    }
   }
 
   // password screen
@@ -65,7 +94,7 @@ function AdminPage() {
         <p className="text-xs font-semibold text-teal-300 uppercase tracking-widest mb-3">
           Admin
         </p>
-        <h1 className="text-2xl text-white  mb-2 font-poppins font-bold tracking-wide">
+        <h1 className="text-2xl text-white mb-2 font-poppins font-bold tracking-wide">
           Restricted access
         </h1>
         <p className="text-sm text-slate-500 mb-8 pb-8 border-b border-white/5 font-semibold font-sans">
@@ -77,19 +106,24 @@ function AdminPage() {
         <input
           type="password"
           placeholder="••••••••"
+          value={password}
           onChange={e => setPassword(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && (password === import.meta.env.VITE_AUTH_PASSWORD ? setAuthed(true) : alert('Wrong password'))}
+          onKeyDown={handleKeyPress}
           className="w-full bg-[#1a1a1a] border border-[#1e293b] text-slate-200 text-sm px-4 py-3 rounded outline-none focus:border-teal-300/50 transition-colors placeholder-slate-600 mb-6"
         />
         <button
-          onClick={() => password === import.meta.env.VITE_AUTH_PASSWORD ? setAuthed(true) : alert('Wrong password')}
-          className="w-full bg-teal-300 text-slate-900 text-xs font-semibold uppercase tracking-widest py-3 rounded hover:bg-teal-200 transition-colors"
+          onClick={checkPassword}
+          className="w-full bg-teal-300 text-slate-900 text-xs font-semibold uppercase tracking-widest py-3 rounded hover:bg-teal-200 transition-colors hover:cursor-pointer"
         >
           Enter
         </button>
       </div>
     )
   }
+
+  const totalCount = queries.length
+  const pendingCount = queries.filter(q => q.status === 'pending').length
+  const resolvedCount = queries.filter(q => q.status === 'resolved').length
 
   return (
     <div className="max-w-4xl mx-auto px-8 py-12">
@@ -105,24 +139,28 @@ function AdminPage() {
           <p className="text-sm text-slate-500 font-semibold font-sans">
             You have{' '}
             <span className="text-amber-400 font-bold font-poppins animate-pulse">
-              {queries.filter(q => q.status === 'pending').length} pending
+              {pendingCount} pending
             </span>{' '}
-            {queries.filter(q => q.status === 'pending').length === 1 ? 'query' : 'queries'} to review
+            {pendingCount === 1 ? 'query' : 'queries'} to review
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-10">
-        {[
-          { label: 'Total queries', count: queries.length },
-          { label: 'Pending', count: queries.filter(q => q.status === 'pending').length },
-          { label: 'Resolved', count: queries.filter(q => q.status === 'resolved').length },
-        ].map(stat => (
-          <div key={stat.label} className="bg-[#141414] border border-white/5 rounded p-5">
-            <p className="text-2xl font-semibold text-white mb-1 font-mono">{stat.count}</p>
-            <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{stat.label}</p>
-          </div>
-        ))}
+        <div className="bg-[#141414] border border-white/5 rounded p-5">
+          <p className="text-2xl font-semibold text-white mb-1 font-mono">{totalCount}</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Total queries</p>
+        </div>
+
+        <div className="bg-[#141414] border border-white/5 rounded p-5">
+          <p className="text-2xl font-semibold text-white mb-1 font-mono">{pendingCount}</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Pending</p>
+        </div>
+
+        <div className="bg-[#141414] border border-white/5 rounded p-5">
+          <p className="text-2xl font-semibold text-white mb-1 font-mono">{resolvedCount}</p>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Resolved</p>
+        </div>
       </div>
 
       <div className="flex gap-3 mb-6">

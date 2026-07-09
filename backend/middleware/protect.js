@@ -7,16 +7,20 @@ const protect = (req, res, next) => {
     console.log('protect middleware - JWT_SECRET:', process.env.JWT_SECRET)
 
     if (!token) {
+      console.log('no authentication token found in cookies')
       return res.status(401).json({ message: 'Not logged in' })
     }
 
+    // decoding token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     req.user = decoded
-    next()
+
+    // continue down the pipeline route
+    return next()
 
   } catch (error) {
     console.log('protect error:', error.message)
-    res.status(401).json({ message: 'Invalid or expired token' })
+    return res.status(401).json({ message: 'Invalid or expired token' })
   }
 }
 

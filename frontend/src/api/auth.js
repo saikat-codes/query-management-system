@@ -2,7 +2,22 @@ import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000'
 
-export const loginUser = (data) => axios.post(`${BASE_URL}/api/auth/login`, data, { withCredentials: true })
-export const logoutUser = () => axios.post(`${BASE_URL}/api/auth/logout`, {}, { withCredentials: true })
-export const getMe = () => axios.get(`${BASE_URL}/api/auth/me`, { withCredentials: true })
-export const getMyQueries = () => axios.get(`${BASE_URL}/api/queries/my`, { withCredentials: true })
+export const loginUser = (data) => {
+  console.log('API call: loginUser running...')
+  return axios.post(`${BASE_URL}/api/auth/login`, data, { withCredentials: true })
+}
+
+export const logoutUser = () => {
+  console.log('API call: logoutUser running...')
+  return axios.post(`${BASE_URL}/api/auth/logout`, {}, { withCredentials: true })
+}
+
+export const getMe = () => {
+  console.log('API call: getting current logged in user details...')
+  return axios.get(`${BASE_URL}/api/auth/me`, { withCredentials: true })
+}
+
+export const getMyQueries = () => {
+  console.log('API call: pulling logged in user history records...')
+  return axios.get(`${BASE_URL}/api/queries/my`, { withCredentials: true })
+}
