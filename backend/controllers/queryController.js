@@ -1,95 +1,101 @@
-const User = require('../models/User')
+const User = require('../models/User');
 const Query = require("../models/Query");
-const { sendEmail, sendTelegram } = require('../utils/notifications')
+const { sendEmail, sendTelegram } = require('../utils/notifications');
 
-//create query
+// create query (Protected via middleware)
 const createQuery = async (req, res) => {
   try {
-    const { name, email, message, password } = req.body
+    const { name, message } = req.body;
+    console.log('creating query for logged-in user id:', req.user.userId);
 
-    // find user
-    let user = await User.findOne({ email })
-
-    if (user) {
-      // user exists —> verify password
-      const isMatch = await user.matchPassword(password)
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Incorrect password' })
-      }
-    } else {
-      // new user —> create account
-      user = await User.create({ name, email, password })
+    // 1. Find user from the auth token
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      console.log('failed to find active session matching token id');
+      return res.status(404).json({ message: 'User account session not found' });
     }
 
-    // save query linked to user
-    const query = await Query.create({ name, email, message, userId: user._id })
+    // 2. Save query to database with user reference
+    const query = await Query.create({
+      name: name || user.name,
+      email: user.email,
+      message: message,
+      userId: user._id
+    });
 
-    await sendEmail(email, name, message, 'pending')
-    await sendTelegram(name, email, message, 'pending')
+    console.log('saved new query entry to mongo:', query._id);
 
-    res.status(201).json(query)
+    // notification integrations
+    console.log('triggering notification integrations...');
+    await sendEmail(user.email, name || user.name, message, 'pending');
+    await sendTelegram(name || user.name, user.email, message, 'pending');
+
+    return res.status(201).json(query);
 
   } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-//get only user's query
-const getMyQueries = async (req, res) => {
-  try {
-    const queries = await Query.find({ userId: req.user.userId }).sort({ createdAt: -1 })
-    res.status(200).json(queries)
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-//get query
-const getAllQueries = async (req, res) => {
-  try {
-    const queries = await Query.find().sort({ createdAt: -1 });
-    res.status(200).json(queries);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log('error inside createQuery:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
-//update query
+const getMyQueries = async (req, res) => {
+  try {
+    console.log('pulling private queries history list for user:', req.user.userId);
+    const queries = await Query.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+    return res.status(200).json(queries);
+  } catch (error) {
+    console.log('error inside getMyQueries:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAllQueries = async (req, res) => {
+  try {
+    console.log('admin dashboard request: pulling all site records...');
+    const queries = await Query.find().sort({ createdAt: -1 });
+    return res.status(200).json(queries);
+  } catch (error) {
+    console.log('error inside getAllQueries:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const updateQuery = async (req, res) => {
   try {
-    const query = await Query.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true },
-    );
+    console.log('updating query reference target id:', req.params.id, 'status:', req.body.status);
+    const query = await Query.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
 
     if (!query) {
+      console.log('update failed: target record not found');
       return res.status(404).json({ message: "Query not found" });
     }
 
-// send update text
-    await sendEmail(query.email, query.name, query.message, req.body.status)
-    await sendTelegram(query.name, query.email, query.message, req.body.status)
+    console.log('dispatching status update notifications...');
+    await sendEmail(query.email, query.name, query.message, req.body.status);
+    await sendTelegram(query.name, query.email, query.message, req.body.status);
 
-    res.status(200).json(query);
+    return res.status(200).json(query);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log('error inside updateQuery:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
-//delete query
 const deleteQuery = async (req, res) => {
   try {
+    console.log('attempting to drop database record id:', req.params.id);
     const query = await Query.findByIdAndDelete(req.params.id);
 
     if (!query) {
+      console.log('delete target failed: item missing');
       return res.status(404).json({ message: "Query not found" });
     }
 
-    res.status(200).json({ message: "Query deleted" });
+    return res.status(200).json({ message: "Query deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log('error inside deleteQuery:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { createQuery, getAllQueries, updateQuery, deleteQuery, getMyQueries }
+module.exports = { createQuery, getAllQueries, updateQuery, deleteQuery, getMyQueries };
