@@ -67,7 +67,7 @@ function AuthPage({ onLoginSuccess }) {
       </h1>
 
       {apiError && (
-        <div className="bg-rose-500/5 border border-rose-500/20 rounded px-4 py-3 text-rose-400 text-sm mb-6">
+        <div className="bg-green-500/5 border border-green-500/20 rounded px-4 py-3 text-green-400 text-sm mb-6">
           {apiError}
         </div>
       )}
