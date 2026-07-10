@@ -121,13 +121,15 @@ flowchart LR
 
 # 🎥 Demo
 
-<div align="center">
+<p align="center">
+  <a href="https://youtu.be/IcnsgxBToK0" target="_blank">
+    <img src="screenshots/user-page.png" alt="Watch the Demo" width="800">
+  </a>
+</p>
 
-> **See QueryFlow in action**
-
-<img src="screenshots/demo.mp4" alt="QueryFlow Demo" width="900"/>
-
-</div>
+<p align="center">
+  <strong>▶️ Click the image above to watch the full demo (1 min 20 sec)</strong>
+</p>
 
 ---
 
@@ -361,7 +363,6 @@ query-management-system
 │       └── App.jsx
 │
 ├── screenshots
-│   ├── demo.mp4
 │   ├── user-page.png
 │   ├── admin-panel.png
 │   └── email-notification.png
