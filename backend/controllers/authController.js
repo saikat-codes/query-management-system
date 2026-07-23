@@ -71,16 +71,33 @@ const loginUser = async (req, res) => {
   }
 }
 
-const logoutUser = (req, res) => {
-  console.log('Clearing authentication token cookie node layer...')
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    expires: new Date(0)
-  })
-  return res.status(200).json({ message: 'Logged out' })
-}
+
+const logoutUser = async (req, res) => {
+  try {
+
+    res.cookie('token', '', {
+      httpOnly: true,
+      expires: new Date(0),
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/' 
+    });
+
+    console.log('Auth Pipeline: Session cookie successfully invalidated.');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully.'
+    });
+
+  } catch (error) {
+    console.log('Error inside logoutUser controller:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'An error occurred while logging out.'
+    });
+  }
+};
 
 const getMe = async (req, res) => {
   try {
